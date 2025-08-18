@@ -4,7 +4,11 @@ import lombok.*;
 import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemRequest {
     private Long id;
 

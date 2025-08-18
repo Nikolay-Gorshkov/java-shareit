@@ -46,7 +46,9 @@ public class UserServiceImpl implements UserService {
         return repo.findAll().stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 
-    @Override public void delete(Long id) { repo.deleteById(id); }
+    @Override public void delete(Long id) {
+        repo.deleteById(id);
+    }
 
     private void validateEmail(String email, Long ignoreId) {
         if (email == null || email.isBlank() || !email.contains("@")) {
