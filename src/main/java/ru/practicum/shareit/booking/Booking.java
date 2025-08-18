@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
 /**
- * TODO
+ * базовая ветка
  */
 public class Booking {
 }
