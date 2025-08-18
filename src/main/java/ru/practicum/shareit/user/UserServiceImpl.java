@@ -50,10 +50,10 @@ public class UserServiceImpl implements UserService {
 
     private void validateEmail(String email, Long ignoreId) {
         if (email == null || email.isBlank() || !email.contains("@")) {
-            throw new ValidationException("Invalid email"); // 400
+            throw new ValidationException("Invalid email");
         }
         if (repo.existsEmail(email, ignoreId)) {
-            throw new ConflictException("Email already in use"); // 409
+            throw new ConflictException("Email already in use");
         }
     }
 }

@@ -14,11 +14,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor   // <— Lombok сам создаст конструктор (repo, userService)
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository repo;       // <— final обязательно!
-    private final UserService userService;   // <— final обязательно!
+    private final ItemRepository repo;
+    private final UserService userService;
     private final AtomicLong seq = new AtomicLong(0);
 
     @Override
@@ -73,19 +73,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void ensureUserExists(Long id) {
-        userService.get(id); // бросит 404, если пользователя нет
+        userService.get(id);
     }
 
     // ItemServiceImpl
     private void validateItem(ItemDto dto) {
         if (dto.getName() == null || dto.getName().isBlank())
-            throw new ValidationException("Item name is required"); // 400
+            throw new ValidationException("Item name is required");
 
         if (dto.getDescription() == null || dto.getDescription().isBlank())
-            throw new ValidationException("Item description is required"); // 400
+            throw new ValidationException("Item description is required");
 
         if (dto.getAvailable() == null)
-            throw new ValidationException("Item 'available' is required"); // 400
+            throw new ValidationException("Item 'available' is required");
     }
 
 }
