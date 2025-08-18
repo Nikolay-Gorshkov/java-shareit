@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
 /**
- * TODO Sprint add-bookings.
+ * TODO
  */
 public class Booking {
 }
