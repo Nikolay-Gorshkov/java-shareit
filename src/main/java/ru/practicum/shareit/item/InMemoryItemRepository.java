@@ -30,8 +30,24 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> findAllByOwner(Long ownerId) {
-        return storage.values().stream()
+        return storage
+                .values()
+                .stream()
                 .filter(i -> Objects.equals(i.getOwner(), ownerId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Item> findAvailableByText(String q) {
+        return storage
+                .values()
+                .stream()
+                .filter(Item::getAvailable)
+                .filter(i ->
+                        (i.getName() != null && i.getName().toLowerCase().contains(q)) ||
+                                (i.getDescription() != null && i.getDescription().toLowerCase().contains(q))
+                )
+                .map(i -> i)
                 .collect(Collectors.toList());
     }
 }
