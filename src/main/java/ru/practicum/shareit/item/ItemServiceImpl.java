@@ -97,8 +97,10 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Comment text is required");
         }
 
-        LocalDateTime moment = LocalDateTime.now().plusHours(3).plusSeconds(1);
-        boolean allowed = bookingRepo.hasUserFinishedApprovedBooking(itemId, userId, moment);
+        LocalDateTime now = LocalDateTime.now();
+
+        boolean allowed = bookingRepo.existsByItem_IdAndBooker_IdAndStatusAndEndLessThanEqual(
+                itemId, userId, Booking.Status.APPROVED, now);
 
         if (!allowed) {
             throw new ValidationException("Only users who completed approved booking can comment");
