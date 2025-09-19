@@ -138,12 +138,9 @@ public class ItemServiceImpl implements ItemService {
 
         Instant now = Instant.now(clock);
 
-        Instant tolerance = now.plus(Duration.ofHours(3));
-
-        boolean allowed =
-                bookingRepo.existsByItem_IdAndBooker_IdAndStatusAndEndLessThanEqual(
-                        itemId, userId, Booking.Status.APPROVED, tolerance)
-                        || bookingRepo.hasFinishedApprovedBooking(itemId, userId);
+        boolean allowed = bookingRepo.existsByItem_IdAndBooker_IdAndStatusAndEndLessThanEqual(
+                itemId, userId, Booking.Status.APPROVED, now
+        );
 
         if (!allowed) {
             log.warn("Comment denied: no finished APPROVED booking (itemId={}, userId={}, now={})",
@@ -158,6 +155,7 @@ public class ItemServiceImpl implements ItemService {
         Comment saved = commentRepo.save(CommentMapper.from(dto.getText(), item, author, created));
         return CommentMapper.toDto(saved);
     }
+
 
 
 
