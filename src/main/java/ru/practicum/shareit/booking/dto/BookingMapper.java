@@ -4,8 +4,9 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
-public class BookingMapper {
+import java.time.ZoneId;
 
+public class BookingMapper {
     public static BookingDto toDto(Booking b) {
         return BookingDto.builder()
                 .id(b.getId())
@@ -17,8 +18,10 @@ public class BookingMapper {
                         .id(b.getBooker().getId())
                         .name(b.getBooker().getName())
                         .build())
-                .start(b.getStart())
-                .end(b.getEnd())
+                .start(b.getStart() == null ? null
+                        : b.getStart().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .end(b.getEnd() == null ? null
+                        : b.getEnd().atZone(ZoneId.systemDefault()).toLocalDateTime())
                 .status(b.getStatus().name())
                 .build();
     }
@@ -27,8 +30,8 @@ public class BookingMapper {
         return Booking.builder()
                 .item(item)
                 .booker(booker)
-                .start(dto.getStart())
-                .end(dto.getEnd())
+                .start(dto.getStart().atZone(ZoneId.systemDefault()).toInstant())
+                .end(dto.getEnd().atZone(ZoneId.systemDefault()).toInstant())
                 .status(Booking.Status.WAITING)
                 .build();
     }

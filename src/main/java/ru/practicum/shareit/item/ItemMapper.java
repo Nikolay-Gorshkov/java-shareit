@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
@@ -25,6 +26,17 @@ public class ItemMapper {
                 .available(dto.getAvailable())
                 .owner(owner)
                 .request(dto.getRequestId())
+                .build();
+    }
+
+    public static ItemDtoWithBookings toDtoWithBookingsSkeleton(Item i) {
+        if (i == null) return null;
+        return ItemDtoWithBookings.builder()
+                .id(i.getId())
+                .name(i.getName())
+                .description(i.getDescription())
+                .available(i.getAvailable())
+                .requestId(i.getRequest())
                 .build();
     }
 }

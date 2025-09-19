@@ -17,9 +17,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,24 +28,26 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository repo;
     private final UserRepository userRepo;
     private final ItemRepository itemRepo;
+    private final Clock clock;
 
     private static final Sort SORT_DESC = Sort.by(Sort.Direction.DESC, "start");
 
     @Override
     public BookingDto create(Long userId, BookingCreateDto dto) {
-        User booker = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-        Item item = itemRepo.findById(dto.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item not found: " + dto.getItemId()));
+        User booker = getUserOrThrow(userId);
+        Item item = getItemOrThrow(dto.getItemId());
 
-        if (item.getOwner().getId().equals(userId))
+        if (item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Owner cannot book own item");
+        }
 
-        if (dto.getStart() == null || dto.getEnd() == null || !dto.getStart().isBefore(dto.getEnd()))
+        if (dto.getStart() == null || dto.getEnd() == null || !dto.getEnd().isAfter(dto.getStart())) {
             throw new ValidationException("Invalid booking dates");
+        }
 
-        if (Boolean.FALSE.equals(item.getAvailable()))
+        if (Boolean.FALSE.equals(item.getAvailable())) {
             throw new ValidationException("Item not available for booking");
+        }
 
         var booking = BookingMapper.fromCreateDto(dto, item, booker);
         booking = repo.save(booking);
@@ -54,11 +56,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto approve(Long ownerId, Long bookingId, boolean approved) {
-        var booking = repo.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
-        if (!booking.getItem().getOwner().getId().equals(ownerId))
+        var booking = getBookingOrThrow(bookingId);
+        if (!booking.getItem().getOwner().getId().equals(ownerId)) {
             throw new ForbiddenException("Only owner can approve/reject booking");
-        if (booking.getStatus() != Booking.Status.WAITING)
+        }
+        if (booking.getStatus() != Booking.Status.WAITING) {
             throw new ConflictException("Booking already processed");
+        }
 
         booking.setStatus(approved ? Booking.Status.APPROVED : Booking.Status.REJECTED);
         return BookingMapper.toDto(repo.save(booking));
@@ -66,19 +70,21 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto get(Long userId, Long bookingId) {
-        var booking = repo.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
+        var booking = getBookingOrThrow(bookingId);
         Long ownerId = booking.getItem().getOwner().getId();
-        if (!booking.getBooker().getId().equals(userId) && !ownerId.equals(userId))
-            throw new NotFoundException("Booking not available to user"); // как в условии
+        if (!booking.getBooker().getId().equals(userId) && !ownerId.equals(userId)) {
+            // как в условии
+            throw new NotFoundException("Booking not available to user");
+        }
         return BookingMapper.toDto(booking);
     }
 
-
     @Override
     public List<BookingDto> getUserBookings(Long userId, String stateStr) {
-        userRepo.findById(userId).orElseThrow(() -> new NotFoundException("User not found: " + userId));
+        getUserOrThrow(userId);
         BookingState state = BookingState.from(stateStr);
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now(clock);
+
         List<Booking> result = switch (state) {
             case ALL -> repo.findByBooker_Id(userId, SORT_DESC);
             case CURRENT -> repo.findByBooker_IdAndStartBeforeAndEndAfter(userId, now, now, SORT_DESC);
@@ -87,14 +93,15 @@ public class BookingServiceImpl implements BookingService {
             case WAITING -> repo.findByBooker_IdAndStatus(userId, Booking.Status.WAITING, SORT_DESC);
             case REJECTED -> repo.findByBooker_IdAndStatus(userId, Booking.Status.REJECTED, SORT_DESC);
         };
-        return result.stream().map(BookingMapper::toDto).collect(Collectors.toList());
+        return result.stream().map(BookingMapper::toDto).toList();
     }
 
     @Override
     public List<BookingDto> getOwnerBookings(Long ownerId, String stateStr) {
-        userRepo.findById(ownerId).orElseThrow(() -> new NotFoundException("User not found: " + ownerId));
+        getUserOrThrow(ownerId);
         BookingState state = BookingState.from(stateStr);
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now(clock);
+
         List<Booking> result = switch (state) {
             case ALL -> repo.findByItem_Owner_Id(ownerId, SORT_DESC);
             case CURRENT -> repo.findByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId, now, now, SORT_DESC);
@@ -103,7 +110,21 @@ public class BookingServiceImpl implements BookingService {
             case WAITING -> repo.findByItem_Owner_IdAndStatus(ownerId, Booking.Status.WAITING, SORT_DESC);
             case REJECTED -> repo.findByItem_Owner_IdAndStatus(ownerId, Booking.Status.REJECTED, SORT_DESC);
         };
-        return result.stream().map(BookingMapper::toDto).collect(Collectors.toList());
+        return result.stream().map(BookingMapper::toDto).toList();
+    }
+
+    private User getUserOrThrow(Long userId) {
+        return userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+    }
+
+    private Item getItemOrThrow(Long itemId) {
+        return itemRepo.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item not found: " + itemId));
+    }
+
+    private Booking getBookingOrThrow(Long bookingId) {
+        return repo.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
     }
 }
-

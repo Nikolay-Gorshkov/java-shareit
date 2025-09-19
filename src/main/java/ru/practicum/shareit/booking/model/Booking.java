@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.*;
 
@@ -27,10 +27,10 @@ public class Booking {
     private Long id;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime start;
+    private Instant start;   // было LocalDateTime
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime end;
+    private Instant end;     // было LocalDateTime
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
