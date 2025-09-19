@@ -156,12 +156,6 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toDto(saved);
     }
 
-
-
-
-
-
-
     @Override
     public ItemDtoWithBookings get(Long itemId, Long requesterId) {
         return toItemDtoWithBookings(itemId, requesterId);
