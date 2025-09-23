@@ -9,8 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.RequestClient;
 
-import java.util.Map;
-
 @Validated
 @RestController
 @RequiredArgsConstructor

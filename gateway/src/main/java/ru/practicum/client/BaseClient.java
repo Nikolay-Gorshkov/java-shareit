@@ -117,7 +117,6 @@ public class BaseClient {
         try {
             if (type == String.class) return (T) body;
             if (type == Object.class) return (T) mapper.readValue(body, Object.class);
-            // На DTO не парсим, gateway возвращает Object
             return null;
         } catch (JsonProcessingException ex) {
             if (type == Object.class) return (T) Map.of("error", body);
