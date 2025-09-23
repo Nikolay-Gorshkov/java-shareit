@@ -1,4 +1,4 @@
-package ru.practicum.user;
+package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.*;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.client.UserClient;
+import ru.practicum.user.UserController;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
