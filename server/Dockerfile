@@ -15,6 +15,11 @@ RUN mvn -U -pl server -am -DskipTests -P ${MVN_PROFILES} package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+# Устанавливаем curl для healthcheck'ов и чистим кэш
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
 # фиксируем тайзону и опции JVM
 ENV TZ=UTC
 ENV JAVA_TOOL_OPTIONS="-Duser.timezone=UTC -Dfile.encoding=UTF-8"

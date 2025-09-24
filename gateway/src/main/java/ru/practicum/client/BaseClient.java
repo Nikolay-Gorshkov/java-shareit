@@ -25,7 +25,7 @@ public class BaseClient {
     private final RestTemplate rest;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${shareit-server.url}")
+    @Value("${shareit.server.url}")
     private String serverUrl;
 
     public <T> ResponseEntity<T> get(String path, @Nullable Map<String, Object> params,
