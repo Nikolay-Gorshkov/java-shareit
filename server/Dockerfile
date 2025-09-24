@@ -8,19 +8,22 @@ COPY gateway/pom.xml gateway/pom.xml
 COPY server ./server
 COPY gateway ./gateway
 
-ARG MVN_PROFILES=
-RUN mvn -U -pl server -am -DskipTests -P ${MVN_PROFILES} package
+# Профиль передаём только если он задан
+ARG MVN_PROFILES
+RUN if [ -n "$MVN_PROFILES" ]; then \
+      mvn -U -pl server -am -DskipTests -P "$MVN_PROFILES" package ; \
+    else \
+      mvn -U -pl server -am -DskipTests package ; \
+    fi
 
 # --- runtime stage ---
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Устанавливаем curl для healthcheck'ов и чистим кэш
-RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
- && rm -rf /var/lib/apt/lists/*
+# curl для healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-# фиксируем тайзону и опции JVM
+# таймзона/encoding
 ENV TZ=UTC
 ENV JAVA_TOOL_OPTIONS="-Duser.timezone=UTC -Dfile.encoding=UTF-8"
 
