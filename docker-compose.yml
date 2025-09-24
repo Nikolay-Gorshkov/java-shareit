@@ -3,6 +3,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16
+    container_name: shareit-postgres
     environment:
       POSTGRES_DB: shareit
       POSTGRES_USER: shareit
@@ -21,6 +22,7 @@ services:
       dockerfile: server/Dockerfile
       args:
         MVN_PROFILES: ""   # дефолт
+    container_name: shareit-server
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,6 +43,7 @@ services:
     build:
       context: .
       dockerfile: gateway/Dockerfile
+    container_name: shareit-gateway
     depends_on:
       server:
         condition: service_healthy
