@@ -146,12 +146,10 @@ public class ItemServiceImpl implements ItemService {
 
         Instant now = Instant.now(clock);
 
-        // ⚙️ Основная проверка — по времени приложения
         boolean allowedByAppClock = bookingRepo
                 .existsByItem_IdAndBooker_IdAndStatusAndEndLessThanEqual(
                         itemId, userId, Booking.Status.APPROVED, now);
 
-        // ⚙️ Резервная проверка — по времени БД (CURRENT_TIMESTAMP)
         boolean allowedByDbClock = bookingRepo.hasFinishedApprovedBooking(itemId, userId);
 
         boolean allowed = allowedByAppClock || allowedByDbClock;
