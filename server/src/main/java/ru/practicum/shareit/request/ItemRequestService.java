@@ -13,7 +13,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestOutDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.request.ItemRequestRepository;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -98,4 +97,3 @@ public class ItemRequestService {
         this.clock = clock != null ? clock : Clock.systemUTC();
     }
 }
-
