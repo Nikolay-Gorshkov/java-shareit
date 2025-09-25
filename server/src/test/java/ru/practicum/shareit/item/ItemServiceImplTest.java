@@ -6,11 +6,11 @@ import org.mockito.*;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.ForbiddenException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -27,13 +27,14 @@ class ItemServiceImplTest {
     @Mock private UserRepository userRepo;
     @Mock private BookingRepository bookingRepo;
     @Mock private CommentRepository commentRepo;
+    @Mock private ItemRequestRepository requestRepo;
     private Clock clock;
     @InjectMocks private ItemServiceImpl service;
 
     @BeforeEach void init() {
         MockitoAnnotations.openMocks(this);
         clock = Clock.fixed(Instant.parse("2025-01-01T10:00:00Z"), ZoneOffset.UTC);
-        service = new ItemServiceImpl(repo, userRepo, bookingRepo, commentRepo, clock);
+        service = new ItemServiceImpl(repo, userRepo, bookingRepo, commentRepo, clock, requestRepo);
     }
 
     @Test
