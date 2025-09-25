@@ -13,6 +13,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestOutDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.request.ItemRequestRepository;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -27,22 +28,22 @@ public class ItemRequestService {
     private final UserRepository userRepo;
     private Clock clock = Clock.systemUTC();
 
+
     @Transactional
     public ItemRequestDto create(Long userId, ItemRequestDto dto) {
-        LocalDateTime now = LocalDateTime.now(clock);
         if (dto.getDescription() == null || dto.getDescription().isBlank()) {
             throw new ValidationException("Description is required");
         }
         User requestor = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-        ItemRequest entity = ItemRequest.builder()
-                .description(dto.getDescription())
-                .requestor(requestor)
-                .created(LocalDateTime.now(clock))
-                .build();
+
+        LocalDateTime now = LocalDateTime.now(clock);
+        ItemRequest entity = ItemRequestMapper.fromCreateDto(dto, requestor, now);
+
         entity = requestRepo.save(entity);
         return ItemRequestMapper.toDto(entity);
     }
+
 
     @Transactional(readOnly = true)
     public List<ItemRequestOutDto> getOwn(Long userId) {

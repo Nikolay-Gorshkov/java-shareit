@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.RequestClient;
+import ru.practicum.request.dto.ItemRequestCreateIn;
 
 @Validated
 @RestController
@@ -16,10 +17,6 @@ import ru.practicum.client.RequestClient;
 public class RequestController {
     private static final String HEADER_USER = "X-Sharer-User-Id";
     private final RequestClient client;
-
-    public static class ItemRequestCreateIn {
-        @NotBlank public String description;
-    }
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader(HEADER_USER) Long userId,

@@ -2,14 +2,13 @@ package ru.practicum.booking;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.BookingClient;
+import ru.practicum.booking.dto.BookingCreateIn;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Validated
@@ -20,20 +19,17 @@ public class BookingController {
     private static final String HEADER_USER = "X-Sharer-User-Id";
     private final BookingClient client;
 
-    public static class BookingCreateIn {
-        @NotNull public Long itemId;
-        @NotNull public LocalDateTime start;
-        @NotNull public LocalDateTime end;
-    }
-
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader(HEADER_USER) Long userId,
                                          @RequestBody @Valid BookingCreateIn dto) {
-        if (!dto.end.isAfter(dto.start)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "end must be after start"));
+
+        if (dto.start.isBefore(dto.end)) {
+            return client.create(userId, dto);
         }
-        return client.create(userId, dto);
+        return ResponseEntity.badRequest()
+                .body(Map.of("error", "end must be after start"));
     }
+
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity<Object> approve(@RequestHeader(HEADER_USER) Long ownerId,

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.ItemClient;
+import ru.practicum.request.dto.ItemRequestCreateIn;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +19,6 @@ import java.util.Map;
 public class ItemController {
     private static final String HEADER_USER = "X-Sharer-User-Id";
     private final ItemClient client;
-
-    public static class ItemDtoIn {
-        public Long id;
-        @jakarta.validation.constraints.NotBlank public String name;
-        @jakarta.validation.constraints.NotBlank public String description;
-        @jakarta.validation.constraints.NotNull  public Boolean available;
-        public Long requestId;
-    }
 
     @PostMapping
     public ResponseEntity<Object> add(@RequestHeader(HEADER_USER) Long userId,

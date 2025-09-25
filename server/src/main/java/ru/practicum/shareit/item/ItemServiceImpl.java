@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.request.ItemRequestRepository;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -32,6 +33,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepo;
     private final CommentRepository commentRepo;
     private final Clock clock;
+    private final ItemRequestRepository requestRepo;
 
     @Override
     public ItemDto add(Long userId, ItemDto dto) {
@@ -43,6 +45,10 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Item description is required");
         if (dto.getAvailable() == null)
             throw new ValidationException("Item availability is required");
+
+        if (dto.getRequestId() != null && !requestRepo.existsById(dto.getRequestId())) {
+            throw new NotFoundException("Request not found: " + dto.getRequestId());
+        }
 
         var item = ItemMapper.fromDto(dto, owner);
         item = repo.save(item);
@@ -67,7 +73,10 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(patch.getAvailable());
         }
         if (patch.getRequestId() != null) {
-            item.setRequest(patch.getRequestId());
+            if (!requestRepo.existsById(patch.getRequestId())) {
+                throw new NotFoundException("Request not found: " + patch.getRequestId());
+            }
+          item.setRequest(patch.getRequestId());
         }
         item = repo.save(item);
         return ItemMapper.toDto(item);
